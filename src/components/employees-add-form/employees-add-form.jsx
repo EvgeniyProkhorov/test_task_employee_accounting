@@ -7,22 +7,40 @@ class EmployeesAddFrom extends Component {
     this.state = {
       name: "",
       salary: "",
+      nameInputError: false,
+      salaryInputError: false,
     };
   }
 
   onValueChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value,
+      nameInputError: false,
+      salaryInputError: false,
     });
   };
 
   onSubmitAddItem = (e) => {
+    const { name, salary } = this.state;
     e.preventDefault();
-    this.props.onAddItem(this.state.name, this.state.salary);
+    if (name.length < 3) {
+      this.setState({
+        nameInputError: true,
+      });
+    }
+    if (!salary.length) {
+      this.setState({
+        salaryInputError: true,
+      });
+    }
+
+    if (name.length > 2 && salary.length) {
+      this.props.onAddItem(this.state.name, this.state.salary);
+    }
   };
 
   render() {
-    const { name, salary } = this.state;
+    const { name, salary, nameInputError, salaryInputError } = this.state;
     return (
       <div className="app-add-form">
         <h3>Добавьте нового сотрудника</h3>
@@ -52,6 +70,13 @@ class EmployeesAddFrom extends Component {
             Добавить
           </button>
         </form>
+        <div style={{ display: "flex" }}>
+          {nameInputError && (
+            <span className="errorMsg">Имя должно быть более 2х символов</span>
+          )}
+
+          {salaryInputError && <span className="errorMsg">Укажите ЗП</span>}
+        </div>
       </div>
     );
   }
