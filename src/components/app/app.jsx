@@ -28,6 +28,8 @@ class App extends Component {
           id: 3,
         },
       ],
+      term: "",
+      filter: "all",
     };
     this.maxIdCount = 3;
   }
@@ -68,11 +70,43 @@ class App extends Component {
     });
   };
 
+  searchEmployee = (items, term) => {
+    if (term.length === 0) {
+      return items;
+    }
+
+    return items.filter((item) => {
+      return item.name.indexOf(term) > -1;
+    });
+  };
+
+  onUpdateSearch = (term) => {
+    this.setState({ term });
+  };
+
+  filterPost = (items, filter) => {
+    switch (filter) {
+      case "rise":
+        return items.filter((item) => item.rise);
+      case "moreThan1000":
+        return items.filter((item) => item.salary > 1000);
+      default:
+        return items;
+    }
+  };
+
+  onFilterSelect = (filter) => {
+    this.setState({ filter });
+  };
+
   render() {
-    const employeesCount = this.state.data.length;
-    const increaseCount = this.state.data.filter(
-      (elem) => elem.increase
-    ).length;
+    const { data, term, filter } = this.state;
+    const employeesCount = data.length;
+    const increaseCount = data.filter((elem) => elem.increase).length;
+    const visibleData = this.filterPost(
+      this.searchEmployee(data, term),
+      filter
+    );
 
     return (
       <div className="app">
@@ -82,12 +116,12 @@ class App extends Component {
         />
 
         <div className="search-panel">
-          <SearchPanel />
-          <AppFilter />
+          <SearchPanel onUpdateSearch={this.onUpdateSearch} />
+          <AppFilter filter={filter} onFilterSelect={this.onFilterSelect} />
         </div>
 
         <EmployeesList
-          data={this.state.data}
+          data={visibleData}
           onDelete={this.deleteItem}
           onToggleProp={this.onToggleProp}
         />
